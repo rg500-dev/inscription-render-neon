@@ -16,9 +16,8 @@ services:
         sync: false
 
   # Frontend static
-  - type: web
+  - type: static # Correction ici : 'static' remplace 'web' pour les sites statiques
     name: inscription-app-frontend
-    env: static
     rootDir: frontend
     buildCommand: npm install && npm run build
-    publishDir: dist
+    publishDir: dist # Désormais parfaitement valide avec le type static
