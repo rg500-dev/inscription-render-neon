@@ -3,7 +3,7 @@ services:
   - type: web
     name: inscription-app-api
     env: node
-    plan: free # Obligatoire pour forcer l'instance gratuite
+    plan: free
     rootDir: backend
     buildCommand: npm install && npx prisma generate
     startCommand: node src/index.js
@@ -18,8 +18,7 @@ services:
   # Frontend static
   - type: web
     name: inscription-app-frontend
-    env: static # Les sites statiques sont gratuits par défaut
+    env: static
     rootDir: frontend
     buildCommand: npm install && npm run build
-    publishDir: ./dist # Correction ici : Render utilise 'publishDir' et non 'staticPublishPath'
-    
+    publishDir: dist
