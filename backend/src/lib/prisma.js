@@ -8,12 +8,7 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 // 2. Transformer cette réserve en adaptateur compatible Prisma 7
 const adapter = new PrismaPg(pool);
 
-// 3. Injecter l'adaptateur requis au constructeur Prisma
-const prisma = new PrismaClient({ 
-  adapter,
-  datasources: {
-    db: { url: process.env.DATABASE_URL }
-  }
-});
+// 3. Injecter l'adaptateur requis au constructeur Prisma (sans l'option datasources)
+const prisma = new PrismaClient({ adapter });
 
 module.exports = prisma;
