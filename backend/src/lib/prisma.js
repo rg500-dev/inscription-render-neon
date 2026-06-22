@@ -9,6 +9,11 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 
 // 3. Injecter l'adaptateur requis au constructeur Prisma
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient({ 
+  adapter,
+  datasources: {
+    db: { url: process.env.DATABASE_URL }
+  }
+});
 
 module.exports = prisma;
