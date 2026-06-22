@@ -20,4 +20,4 @@ services:
     name: inscription-app-frontend
     rootDir: frontend
     buildCommand: npm install && npm run build
-    publishDir: dist # Désormais parfaitement valide avec le type static
+    staticPublishPath: dist # Désormais parfaitement valide avec le type static
