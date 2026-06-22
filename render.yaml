@@ -9,7 +9,7 @@ services:
     startCommand: node src/index.js
     envVars:
       - key: NODE_VERSION
-        value: 18
+        value: "18"
       - key: DATABASE_URL
         sync: false
       - key: FRONTEND_URL
@@ -22,6 +22,4 @@ services:
     rootDir: frontend
     buildCommand: npm install && npm run build
     publishDir: ./dist # Correction ici : Render utilise 'publishDir' et non 'staticPublishPath'
-    envVars:
-      - key: VITE_API_URL
-        sync: false
+    
