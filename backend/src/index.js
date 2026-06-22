@@ -14,12 +14,31 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 // Middleware
+// Remplacez TOUT votre bloc app.use(cors(...)) actuel par ceci :
 app.use(cors({
-  origin: "https://inscription-app-frontend.onrender.com", 
+  origin: function (origin, callback) {
+    // Si la requête vient d'un outil comme Postman (sans origine), on autorise
+    if (!origin) return callback(null, true);
+
+    // On récupère l'URL sur Render, et on force la suppression des espaces et barres obliques finales
+    const allowedOrigin = process.env.FRONTEND_URL 
+      ? process.env.FRONTEND_URL.trim().replace(/\/$/, "") 
+      : "http://localhost:5173";
+
+    const cleanOrigin = origin.trim().replace(/\/$/, "");
+
+    // Si les adresses nettoyées correspondent, ou en secours pour éviter le crash ERR_INVALID_CHAR
+    if (cleanOrigin === allowedOrigin) {
+      callback(null, true);
+    } else {
+      callback(null, allowedOrigin);
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+
 
 app.use(express.json());
 
