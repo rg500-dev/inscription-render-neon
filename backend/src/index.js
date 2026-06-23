@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 // Charger les variables d'environnement
 dotenv.config();
 
+const { initDB } = require('./lib/db');
 const authRoutes = require('./routes/auth');
 
 const app = express();
@@ -13,7 +14,6 @@ const PORT = process.env.PORT || 10000;
 // Configuration CORS
 app.use(cors({
   origin: function (origin, callback) {
-    // Autoriser les requêtes sans origine (Postman, curl)
     if (!origin) return callback(null, true);
 
     const allowedOrigin = process.env.FRONTEND_URL
@@ -47,7 +47,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Erreur interne du serveur' });
 });
 
-// Démarrage du serveur
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
+// Initialisation DB puis démarrage du serveur
+initDB().then(() => {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}).catch((err) => {
+  console.error('❌ Impossible de démarrer:', err.message);
+  // Démarrer quand même pour que Render ne redémarre pas en boucle
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT} (sans DB)`);
+  });
 });

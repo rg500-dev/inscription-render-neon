@@ -1,17 +1,29 @@
 const { Pool } = require('pg');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  // Configuration SSL requise par Neon
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+let pool = null;
 
-// Créer la table User au démarrage si elle n'existe pas
+// Initialiser la connexion
+const getPool = () => {
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.NODE_ENV === 'production' 
+        ? { rejectUnauthorized: false } 
+        : false,
+      connectionTimeoutMillis: 10000,
+      idleTimeoutMillis: 30000
+    });
+  }
+  return pool;
+};
+
+// Créer la table User au démarrage
 const initDB = async () => {
   try {
-    await pool.query(`
+    const client = await getPool().connect();
+    console.log('✅ Connecté à la base de données');
+    
+    await client.query(`
       CREATE TABLE IF NOT EXISTS "User" (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
@@ -24,12 +36,11 @@ const initDB = async () => {
       );
     `);
     console.log('✅ Table User vérifiée/créée');
+    client.release();
   } catch (error) {
-    console.error('❌ Erreur init DB:', error.message);
+    console.error('❌ Erreur de connexion DB:', error.message);
   }
 };
 
-// Exécuter l'init
-initDB();
-
-module.exports = pool;
+// Exporter le pool et l'init
+module.exports = { getPool, initDB };

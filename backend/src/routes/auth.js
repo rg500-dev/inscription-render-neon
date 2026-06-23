@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const pool = require('../lib/db');
+const { getPool } = require('../lib/db');
 
 const router = express.Router();
 
@@ -8,6 +8,7 @@ const router = express.Router();
 router.post('/register', async (req, res) => {
   try {
     const { email, password, firstName, lastName, tel } = req.body;
+    const pool = getPool();
 
     // Validation
     if (!email || !password || !firstName || !lastName) {
