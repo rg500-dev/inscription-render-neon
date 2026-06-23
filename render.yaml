@@ -5,8 +5,8 @@ services:
     env: node
     plan: free
     rootDir: backend
-    buildCommand: npm install && npx prisma generate
-    startCommand: node src/index.js
+    buildCommand: npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_VERSION
         value: "24"
