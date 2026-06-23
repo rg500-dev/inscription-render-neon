@@ -31,11 +31,19 @@ const initDB = async () => {
         "firstName" VARCHAR(100) NOT NULL,
         "lastName" VARCHAR(100) NOT NULL,
         tel VARCHAR(50),
-        "createdAt" TIMESTAMP DEFAULT NOW(),
-        "updatedAt" TIMESTAMP DEFAULT NOW()
+        "createdAt" TIMESTAMPTZ DEFAULT NOW(),
+        "updatedAt" TIMESTAMPTZ DEFAULT NOW()
       );
     `);
-    console.log('✅ Table User vérifiée/créée');
+    
+    // Mettre à jour les colonnes si la table existait déjà
+    try {
+      await client.query(`ALTER TABLE "User" ALTER COLUMN "updatedAt" SET DEFAULT NOW();`);
+      console.log('✅ Table User vérifiée/créée');
+    } catch (e) {
+      // La colonne existe déjà avec DEFAULT
+      console.log('✅ Table User vérifiée/créée');
+    }
     client.release();
   } catch (error) {
     console.error('❌ Erreur de connexion DB:', error.message);
