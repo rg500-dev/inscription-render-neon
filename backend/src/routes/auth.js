@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const prisma = require('../lib/prisma');
+const pool = require('../lib/db');
 
 const router = express.Router();
 
@@ -23,11 +23,12 @@ router.post('/register', async (req, res) => {
     }
 
     // Vérifier si l'email existe déjà
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
+    const existingUser = await pool.query(
+      'SELECT id FROM "User" WHERE email = $1',
+      [email]
+    );
 
-    if (existingUser) {
+    if (existingUser.rows.length > 0) {
       return res.status(409).json({ 
         error: 'Un compte avec cet email existe déjà' 
       });
@@ -38,23 +39,14 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Créer l'utilisateur
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        firstName,
-        lastName,
-        tel: tel || null
-      },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        tel: true,
-        createdAt: true
-      }
-    });
+    const result = await pool.query(
+      `INSERT INTO "User" (email, password, "firstName", "lastName", tel) 
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, email, "firstName", "lastName", tel, "createdAt"`,
+      [email, hashedPassword, firstName, lastName, tel || null]
+    );
+
+    const user = result.rows[0];
 
     res.status(201).json({
       message: 'Compte créé avec succès',
