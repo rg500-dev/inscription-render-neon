@@ -43,7 +43,8 @@ app.get('/api/health', (req, res) => {
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
+  console.error('❌ Erreur:', err.message);
+  console.error('Stack:', err.stack);
   res.status(500).json({ error: 'Erreur interne du serveur' });
 });
 
@@ -54,7 +55,6 @@ initDB().then(() => {
   });
 }).catch((err) => {
   console.error('❌ Impossible de démarrer:', err.message);
-  // Démarrer quand même pour que Render ne redémarre pas en boucle
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT} (sans DB)`);
   });
